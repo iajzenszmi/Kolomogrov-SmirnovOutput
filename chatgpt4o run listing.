@@ -1,0 +1,85 @@
+The Kolmogorov-Smirnov (K-S) test is a nonparametric test used to compare a sample distribution with a reference probability distribution or to compare two sample distributions. In Fortran 95, you can compute the K-S statistic and its associated p-value. After calculating the K-S statistic, you can plot the empirical distribution function (ECDF) and the theoretical cumulative distribution function (CDF) using Gnuplot.
+
+Here’s how you can do this in Fortran 95, followed by how to plot with Gnuplot.
+
+### Fortran 95 Code to Compute the Kolmogorov-Smirnov Statistic
+
+Here is a sample Fortran code to calculate the K-S statistic:
+
+```fortran
+PROGRAM KS_Test
+  IMPLICIT NONE
+  INTEGER :: i, n
+  REAL :: D, max_diff
+  REAL, ALLOCATABLE :: data(:), F_data(:), F_theory(:)
+  
+  ! Number of data points
+  n = 10
+  ALLOCATE(data(n))
+  ALLOCATE(F_data(n))
+  ALLOCATE(F_theory(n))
+  
+  ! Sample data (replace with your own)
+  data = (/ 0.1, 0.15, 0.35, 0.4, 0.5, 0.6, 0.65, 0.7, 0.85, 0.9 /)
+  
+  ! Theoretical cumulative distribution function (Uniform in this case)
+  DO i = 1, n
+    F_theory(i) = data(i)  ! CDF of Uniform(0,1)
+  END DO
+
+  ! Empirical cumulative distribution function (ECDF)
+  DO i = 1, n
+    F_data(i) = REAL(i) / REAL(n)  ! ECDF
+  END DO
+  
+  ! Calculate the Kolmogorov-Smirnov statistic
+  max_diff = 0.0
+  DO i = 1, n
+    D = ABS(F_data(i) - F_theory(i))
+    IF (D > max_diff) max_diff = D
+  END DO
+
+  PRINT*, 'Kolmogorov-Smirnov Statistic (D): ', max_diff
+
+  DEALLOCATE(data)
+  DEALLOCATE(F_data)
+  DEALLOCATE(F_theory)
+
+END PROGRAM KS_Test
+```
+
+### Gnuplot Script to Plot ECDF and CDF
+
+After running the Fortran code, you can plot the results using Gnuplot. First, save the data into a file (e.g., `ks_test_data.dat`), where each row contains the points for the empirical CDF and theoretical CDF.
+
+Example Gnuplot script (`plot_ks_test.gnuplot`):
+
+```gnuplot
+set terminal pngcairo
+set output 'ks_test_plot.png'
+set xlabel 'Data Points'
+set ylabel 'CDF'
+set title 'Kolmogorov-Smirnov Test: ECDF vs Theoretical CDF'
+set grid
+
+# Plot the ECDF and the theoretical CDF
+plot 'ks_test_data.dat' using 1:2 with steps title 'Empirical CDF', \
+     'ks_test_data.dat' using 1:3 with linespoints title 'Theoretical CDF'
+```
+
+### Steps to Run:
+
+1. Run the Fortran 95 code to calculate the K-S statistic.
+2. Save the empirical and theoretical CDF values in a file `ks_test_data.dat`, for example, in this format:
+   ```
+   0.1 0.1 0.1
+   0.15 0.2 0.15
+   0.35 0.3 0.35
+   ...
+   ```
+3. Execute the Gnuplot script to generate the plot:
+   ```bash
+   gnuplot plot_ks_test.gnuplot
+   ```
+
+The result will be a PNG file (`ks_test_plot.png`) showing the empirical and theoretical CDFs for comparison. Would you like me to assist you in customizing the code further?
